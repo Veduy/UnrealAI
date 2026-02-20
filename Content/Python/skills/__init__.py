@@ -14,6 +14,7 @@ from skills.actor_ops import (
     find_actors_by_name,
     delete_actor,
     set_actor_transform,
+    get_actor_variable,
     set_actor_variable,
 )
 
@@ -44,4 +45,15 @@ from skills.editor_ops import (
     take_screenshot,
     take_screenshot_console,
     get_screenshot_dir,
+)
+
+from skills.component_ops import (
+    get_component_variable,
+    set_component_variable,
+)
+
+from skills.vision_ops import (
+    export_render_target_to_file,
+    analyze_image_with_claude,
+    capture_and_analyze,
 )
