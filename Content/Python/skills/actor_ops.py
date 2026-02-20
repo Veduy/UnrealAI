@@ -162,3 +162,82 @@ def set_actor_transform(name, location=None, rotation=None, scale=None):
         }
     except Exception as e:
         return {"error": str(e)}
+
+
+def set_actor_variable(actor_name, variable_name, value):
+    """레벨 내 액터의 변수(프로퍼티) 값을 설정한다.
+    에디터 상태와 PIE(플레이) 상태를 모두 지원한다.
+
+    Args:
+        actor_name (str): 액터의 내부 이름 (get_name() 결과).
+        variable_name (str): 설정할 변수 이름.
+        value: 설정할 값 (bool, int, float, str 등).
+
+    Returns:
+        dict: {"actor": ..., "variable": ..., "old_value": ..., "new_value": ..., "context": "editor"|"game"}
+              또는 {"error": "..."}
+    """
+    try:
+        target = None
+        context = "editor"
+
+        # 0) PIE 모드 여부 확인
+        is_pie = False
+        try:
+            game_world = unreal.EditorLevelLibrary.get_game_world()
+            is_pie = game_world is not None
+        except Exception:
+            pass
+
+        # 1) PIE 모드: 게임 월드에서 액터 검색
+        if is_pie:
+            try:
+                actors = unreal.GameplayStatics.get_all_actors_of_class(game_world, unreal.Actor)
+                for a in actors:
+                    if a is not None and a.get_name() == actor_name:
+                        target = a
+                        context = "game"
+                        break
+            except Exception:
+                pass
+
+        # 2) 에디터 모드 또는 PIE에서 못 찾은 경우: 에디터 레벨에서 검색
+        if target is None:
+            try:
+                actors = unreal.EditorLevelLibrary.get_all_level_actors()
+                for a in actors:
+                    if a is not None and a.get_name() == actor_name:
+                        target = a
+                        context = "editor"
+                        break
+            except Exception:
+                pass
+
+        if target is None:
+            return {"error": f"Actor not found: {actor_name}"}
+
+        try:
+            old_value = target.get_editor_property(variable_name)
+        except Exception:
+            old_value = getattr(target, variable_name, None)
+
+        # set_editor_property 먼저 시도, 실패하면 setattr로 fallback
+        try:
+            target.set_editor_property(variable_name, value)
+        except Exception:
+            setattr(target, variable_name, value)
+
+        try:
+            new_value = target.get_editor_property(variable_name)
+        except Exception:
+            new_value = getattr(target, variable_name, None)
+
+        return {
+            "actor": actor_name,
+            "variable": variable_name,
+            "old_value": str(old_value),
+            "new_value": str(new_value),
+            "context": context,
+        }
+    except Exception as e:
+        return {"error": str(e)}

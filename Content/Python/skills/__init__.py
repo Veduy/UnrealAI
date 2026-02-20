@@ -14,6 +14,7 @@ from skills.actor_ops import (
     find_actors_by_name,
     delete_actor,
     set_actor_transform,
+    set_actor_variable,
 )
 
 from skills.physics_actor import spawn_physics_blueprint_actor

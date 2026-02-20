@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -X POST http://127.0.0.1:8080/execute -H \"Content-Type: application/json\" -d \"{\"\"mode\"\":\"\"editor\"\",\"\"script\"\":\"\"from skills.editor_ops import stop_pie, start_pie\\\\nimport time\\\\nstop_pie\\(\\)\\\\ntime.sleep\\(1\\)\\\\nresult.update\\(start_pie\\(\\)\\)\"\",\"\"params\"\":{}}\")"
+    ]
+  }
+}
